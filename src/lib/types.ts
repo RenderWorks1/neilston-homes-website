@@ -69,6 +69,8 @@ export interface TrustSignal {
 
 export interface HomePageContent {
   heroImage: string;
+  /** Background MP4 (e.g. /neilston-hero-vid.mp4). `heroImage` is used as poster and reduced-motion fallback. */
+  heroVideo?: string;
   heroHeadline: string;
   heroSubheadline: string;
   homesDelivered: number;

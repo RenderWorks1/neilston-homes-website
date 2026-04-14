@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,14 +15,44 @@ const links = [
   { href: '/tips-and-resources', label: 'Tips and Resources' },
 ];
 
+function heroScrollSolid(): boolean {
+  if (typeof window === 'undefined') return false;
+  const heroHeight = window.innerHeight;
+  return window.scrollY > heroHeight - 80;
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isHome = pathname === '/';
+  const [solidBar, setSolidBar] = useState(!isHome);
+
+  useEffect(() => {
+    if (!isHome) {
+      setSolidBar(true);
+      return;
+    }
+    const update = () => setSolidBar(heroScrollSolid());
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [isHome]);
+
+  const transparentHero = isHome && !solidBar && !open;
 
   return (
-    <header className="sticky top-0 z-50 bg-grey-mid text-white">
-      <div className="container-x flex items-center justify-between h-20">
-        <Link href="/" aria-label="Neilston Homes" className="flex items-center">
+    <header
+      className={cn(
+        'sticky top-0 z-50 text-white transition-colors duration-300',
+        transparentHero ? 'bg-transparent' : 'bg-black',
+      )}
+    >
+      <div className="container-x flex items-center h-20 gap-6 lg:gap-8">
+        <Link href="/" aria-label="Neilston Homes" className="flex shrink-0 items-center">
           <Image
             src="/logos/Neilston Homes - White Logo Transparent.png"
             alt="Neilston Homes"
@@ -33,14 +63,17 @@ export function Navbar() {
           />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-8 tracking-nav">
+        <nav className="hidden min-w-0 flex-1 lg:flex items-center justify-evenly gap-4 xl:gap-6 tracking-nav px-2">
           {links.map((l) => {
             const active = pathname === l.href || pathname.startsWith(l.href + '/');
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={cn('text-sm transition-opacity hover:opacity-100', active ? 'opacity-60' : 'opacity-100')}
+                className={cn(
+                  'shrink-0 text-center text-sm transition-opacity hover:opacity-100',
+                  active ? 'opacity-60' : 'opacity-100',
+                )}
               >
                 {l.label}
               </Link>
@@ -48,15 +81,15 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden lg:block">
-          <Link href="/contact" className="btn-outline-white text-sm">
+        <div className="hidden shrink-0 lg:block">
+          <Link href="/contact" className="btn-outline-white text-sm whitespace-nowrap">
             Contact Us
           </Link>
         </div>
 
         <button
           aria-label="Toggle menu"
-          className="lg:hidden p-2"
+          className="ml-auto p-2 lg:hidden"
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X /> : <Menu />}
@@ -64,7 +97,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div className="lg:hidden bg-grey-mid border-t border-white/20">
+        <div className="lg:hidden bg-black border-t border-white/20">
           <nav className="container-x py-6 flex flex-col gap-4">
             {links.map((l) => (
               <Link

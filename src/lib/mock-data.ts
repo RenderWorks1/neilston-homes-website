@@ -22,6 +22,7 @@ export const siteSettings: SiteSettings = {
 
 export const homePage: HomePageContent = {
   heroImage: '/images/exterior1.png',
+  heroVideo: '/neilston-hero-vid.mp4',
   heroHeadline: 'Own Your Future',
   heroSubheadline: "There's a new home waiting for incredible Kiwis like you",
   homesDelivered: 42,

@@ -11,7 +11,7 @@ export function FeaturedDevelopments() {
   return (
     <section className="py-20 md:py-28 bg-grey-light">
       <Container>
-        <SectionHeading eyebrow="Now Selling" title="Featured Developments">
+        <SectionHeading title="Featured Developments">
           <p>Our latest homes — designed for modern Kiwi living and built to a standard we stand behind.</p>
         </SectionHeading>
         <DevelopmentGrid count={items.length}>
