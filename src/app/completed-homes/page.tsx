@@ -3,15 +3,15 @@ import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { DevelopmentCard, developmentSpecsLine } from '@/components/developments/DevelopmentCard';
 import { DevelopmentGrid } from '@/components/developments/DevelopmentGrid';
-import { completedDevelopments } from '@/lib/mock-data';
+import { completedDevelopments } from '@/lib/developments';
 
 export const metadata: Metadata = {
   title: 'Completed Homes',
   description: 'A record of Neilston Homes developments delivered to Kiwi families across Auckland.',
 };
 
-export default function CompletedHomesPage() {
-  const items = completedDevelopments();
+export default async function CompletedHomesPage() {
+  const items = await completedDevelopments();
   return (
     <div className="py-20 md:py-24">
       <Container>

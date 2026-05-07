@@ -24,9 +24,6 @@ export default function AboutPage() {
               <p>
                 That&rsquo;s why our homes are built to be modern, affordable, sustainable and to a quality Kiwi&rsquo;s expect. Every project is led out of our Auckland office by a team who have been designing and building homes across the region for decades.
               </p>
-              <p>
-                We&rsquo;re proud Master Builders, and every Neilston home is backed by a 10-year guarantee.
-              </p>
             </div>
             <div className="relative aspect-[4/3] bg-grey-light overflow-hidden">
               <Image
@@ -45,18 +42,38 @@ export default function AboutPage() {
         <Container>
           <SectionHeading eyebrow="Our Team" title="The People Behind Your Home" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {teamMembers.map((m) => (
+            {teamMembers.map((m) => {
+              const objectPosition =
+                {
+                  'Sara Daji': 'center 20%',
+                  'Matt Wootton': 'center 20%',
+                }[m.name] ?? 'top';
+              return (
               <div key={m.name} className="text-center md:text-left">
-                <div className="relative aspect-square bg-copper/10 mb-5 flex items-center justify-center">
-                  <span className="font-serif italic text-copper text-5xl">
-                    {m.name.split(' ').map((n) => n[0]).join('')}
-                  </span>
+                <div className="relative aspect-square bg-copper/10 mb-5 overflow-hidden">
+                  {m.photo ? (
+                    <Image
+                      src={m.photo}
+                      alt={m.name}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover"
+                      style={{ objectPosition }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="font-serif italic text-copper text-5xl">
+                        {m.name.split(' ').map((n) => n[0]).join('')}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-serif italic text-copper text-2xl">{m.name}</h3>
                 <p className="text-charcoal/70 text-sm uppercase tracking-wider mb-2">{m.role}</p>
-                <p className="text-charcoal text-sm leading-relaxed">{m.bio}</p>
+                {m.bio && <p className="text-charcoal text-sm leading-relaxed">{m.bio}</p>}
               </div>
-            ))}
+              );
+            })}
           </div>
         </Container>
       </section>
@@ -66,9 +83,9 @@ export default function AboutPage() {
           <SectionHeading eyebrow="What We Believe" title="Our Values" align="center" />
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: 'Transparency', body: 'From first enquiry to handover, you see what\'s happening. Monthly photo updates are standard on every project.' },
-              { title: 'Quality', body: 'Master Build warranty, high-performance building envelopes, and premium specifications — because your home deserves it.' },
-              { title: 'Affordability', body: 'Thoughtful design and efficient delivery mean Kiwi families can still find a modern home they can afford.' },
+              { title: 'Trust and Transparency', body: 'From first enquiry to handover, you can see what\'s happening. Monthly photo updates are standard on every project.' },
+              { title: 'Quality and Design', body: 'We build warm, durable, low-maintenance homes designed to last, with layouts that suit real life, not just look good on paper.' },
+              { title: 'Long Term Value', body: 'We choose well-connected locations, durable materials, and functional layouts that support lasting appeal.' },
             ].map((v) => (
               <div key={v.title} className="p-8 border border-border-grey bg-grey-light">
                 <h3 className="font-serif italic text-copper text-3xl mb-3">{v.title}</h3>

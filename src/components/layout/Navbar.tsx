@@ -7,12 +7,11 @@ import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const links = [
+const baseLinks = [
   { href: '/homes-for-sale', label: 'Homes for Sale' },
   { href: '/completed-homes', label: 'Completed Homes' },
   { href: '/build-updates', label: 'Build Updates' },
   { href: '/about', label: 'About Us' },
-  { href: '/tips-and-resources', label: 'Tips and Resources' },
 ];
 
 function heroScrollSolid(): boolean {
@@ -43,6 +42,7 @@ export function Navbar() {
   }, [isHome]);
 
   const transparentHero = isHome && !solidBar && !open;
+  const links = isHome ? baseLinks : [{ href: '/', label: 'Home' }, ...baseLinks];
 
   return (
     <header
@@ -65,7 +65,7 @@ export function Navbar() {
 
         <nav className="hidden min-w-0 flex-1 lg:flex items-center justify-evenly gap-4 xl:gap-6 tracking-nav px-2">
           {links.map((l) => {
-            const active = pathname === l.href || pathname.startsWith(l.href + '/');
+            const active = l.href === '/' ? pathname === '/' : pathname === l.href || pathname.startsWith(l.href + '/');
             return (
               <Link
                 key={l.href}

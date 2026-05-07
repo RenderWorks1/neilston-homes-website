@@ -9,14 +9,18 @@ import { BuildProgressIndicator } from '@/components/developments/BuildProgressI
 import { LocationMap } from '@/components/developments/LocationMap';
 import { EnquiryForm } from '@/components/developments/EnquiryForm';
 import { StatusBadge } from '@/components/developments/StatusBadge';
-import { developments, getBuildUpdate, getDevelopment } from '@/lib/mock-data';
+import { AvailableHomesTable } from '@/components/developments/AvailableHomesTable';
+import { developments } from '@/lib/mock-data';
+import { getDevelopment } from '@/lib/developments';
+import { getBuildUpdate } from '@/lib/build-updates';
+import { getAvailableHomesForDevelopment } from '@/lib/homes';
 
 export function generateStaticParams() {
   return developments.map((d) => ({ slug: d.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const d = getDevelopment(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const d = await getDevelopment(params.slug);
   if (!d) return { title: 'Development' };
   return {
     title: d.name,
@@ -24,10 +28,14 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function DevelopmentDetailPage({ params }: { params: { slug: string } }) {
-  const d = getDevelopment(params.slug);
+export default async function DevelopmentDetailPage({ params }: { params: { slug: string } }) {
+  const d = await getDevelopment(params.slug);
   if (!d) notFound();
-  const buildUpdate = getBuildUpdate(d.slug);
+  const [buildUpdate, availableHomes] = await Promise.all([
+    getBuildUpdate(d.slug),
+    getAvailableHomesForDevelopment(d.slug),
+  ]);
+  const showHomesTable = d.status !== 'Completed' && availableHomes.length > 0;
 
   return (
     <article>
@@ -84,6 +92,18 @@ export default function DevelopmentDetailPage({ params }: { params: { slug: stri
           <PhotoCarousel images={d.gallery} alt={d.name} />
         </Container>
       </section>
+
+      {showHomesTable && (
+        <section className="py-16 md:py-24 bg-grey-light">
+          <Container>
+            <h2 className="section-title mb-3">Available Homes</h2>
+            <p className="text-charcoal mb-8">
+              {availableHomes.length} of {d.totalHomes} {availableHomes.length === 1 ? 'home' : 'homes'} still available — pricing live from our sales system.
+            </p>
+            <AvailableHomesTable homes={availableHomes} />
+          </Container>
+        </section>
+      )}
 
       {d.floorPlans.length > 0 && (
         <section className="py-16 md:py-24 bg-grey-light">

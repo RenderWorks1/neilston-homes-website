@@ -2,20 +2,22 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Container } from '@/components/ui/Container';
 import { PhotoCarousel } from '@/components/developments/PhotoCarousel';
-import { buildUpdates, getBuildUpdate, getDevelopment } from '@/lib/mock-data';
+import { developments } from '@/lib/mock-data';
+import { getDevelopment } from '@/lib/developments';
+import { getBuildUpdate } from '@/lib/build-updates';
 
 export function generateStaticParams() {
-  return buildUpdates.map((b) => ({ slug: b.slug }));
+  return developments.map((d) => ({ slug: d.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const d = getDevelopment(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const d = await getDevelopment(params.slug);
   return { title: d ? `Build Update — ${d.name}` : 'Build Update' };
 }
 
-export default function BuildUpdatePage({ params }: { params: { slug: string } }) {
-  const development = getDevelopment(params.slug);
-  const update = getBuildUpdate(params.slug);
+export default async function BuildUpdatePage({ params }: { params: { slug: string } }) {
+  const development = await getDevelopment(params.slug);
+  const update = await getBuildUpdate(params.slug);
   if (!development || !update) notFound();
 
   const isCompleted = development.status === 'Completed';

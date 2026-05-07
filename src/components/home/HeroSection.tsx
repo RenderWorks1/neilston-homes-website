@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { FadeIn } from '@/components/ui/FadeIn';
 import type { HomePageContent } from '@/lib/types';
 
 export function HeroSection({ content }: { content: HomePageContent }) {
@@ -31,17 +32,23 @@ export function HeroSection({ content }: { content: HomePageContent }) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50" />
       <div className="relative h-full container-x flex flex-col justify-center">
         <div className="max-w-2xl">
-          <h1 className="font-serif italic text-white drop-shadow-lg" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)', lineHeight: 1 }}>
-            {content.heroHeadline}
-          </h1>
-          <p className="mt-6 text-xl md:text-2xl text-white/95 max-w-xl drop-shadow">
-            {content.heroSubheadline}
-          </p>
-          <div className="mt-10">
-            <Link href="/homes-for-sale" className="btn-primary">
-              View Homes for Sale
-            </Link>
-          </div>
+          <FadeIn immediate>
+            <h1 className="font-serif italic text-white drop-shadow-lg" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)', lineHeight: 1 }}>
+              {content.heroHeadline}
+            </h1>
+          </FadeIn>
+          <FadeIn immediate delay={0.2}>
+            <p className="mt-6 text-xl md:text-2xl text-white/95 max-w-xl drop-shadow">
+              {content.heroSubheadline}
+            </p>
+          </FadeIn>
+          <FadeIn immediate delay={0.4}>
+            <div className="mt-10">
+              <Link href="/homes-for-sale" className="btn-primary">
+                View Homes for Sale
+              </Link>
+            </div>
+          </FadeIn>
         </div>
       </div>
     </section>

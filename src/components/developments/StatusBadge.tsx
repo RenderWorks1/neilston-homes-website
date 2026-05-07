@@ -5,10 +5,19 @@ const styles: Record<DevelopmentStatus, string> = {
   Available: 'bg-status-available',
   'Under Offer': 'bg-status-under-offer',
   Sold: 'bg-status-sold',
+  'Sold Out': 'bg-status-sold',
   Completed: 'bg-charcoal',
 };
 
-export function StatusBadge({ status, className }: { status: DevelopmentStatus; className?: string }) {
+export function StatusBadge({
+  status,
+  label,
+  className,
+}: {
+  status: DevelopmentStatus;
+  label?: string;
+  className?: string;
+}) {
   return (
     <span
       className={cn(
@@ -17,7 +26,7 @@ export function StatusBadge({ status, className }: { status: DevelopmentStatus; 
         className,
       )}
     >
-      {status}
+      {label ?? status}
     </span>
   );
 }

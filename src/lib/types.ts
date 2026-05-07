@@ -1,4 +1,4 @@
-export type DevelopmentStatus = 'Available' | 'Under Offer' | 'Sold' | 'Completed';
+export type DevelopmentStatus = 'Available' | 'Under Offer' | 'Sold' | 'Sold Out' | 'Completed';
 
 export interface FloorPlan {
   label: string;
@@ -10,6 +10,10 @@ export interface Development {
   slug: string;
   name: string;
   status: DevelopmentStatus;
+  /** Overrides badge text (e.g. "Over 60% Sold") while `status` still drives the badge colour. */
+  statusLabel?: string;
+  /** Construction phase shown alongside the sales status (e.g. "Under Construction"). */
+  buildPhase?: string;
   featured?: boolean;
   address: string;
   suburb: string;
@@ -77,6 +81,24 @@ export interface HomePageContent {
   underConstruction: number;
   trustSignals: TrustSignal[];
   aboutText: string[];
+}
+
+export type HomeStatus = 'Available' | 'Sold';
+
+export interface Home {
+  id: string;
+  developmentSlug: string;
+  lot: string;
+  address: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  carparks?: string;
+  landSize?: string;
+  homeSize?: string;
+  price?: number;
+  status: HomeStatus;
+  unconditionalDate?: string;
+  handoverDate?: string;
 }
 
 export interface SiteSettings {

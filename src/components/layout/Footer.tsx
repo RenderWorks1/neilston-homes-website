@@ -8,7 +8,6 @@ const quickLinks = [
   { href: '/completed-homes', label: 'Completed Homes' },
   { href: '/build-updates', label: 'Build Updates' },
   { href: '/about', label: 'About Us' },
-  { href: '/tips-and-resources', label: 'Tips and Resources' },
   { href: '/contact', label: 'Contact Us' },
 ];
 

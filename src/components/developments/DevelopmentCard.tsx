@@ -9,6 +9,8 @@ interface Props {
   address: string;
   specs?: string;
   status?: DevelopmentStatus;
+  statusLabel?: string;
+  buildPhase?: string;
   estimatedCompletion?: string;
   actualCompletion?: string;
   href: string;
@@ -20,6 +22,8 @@ export function DevelopmentCard({
   address,
   specs,
   status,
+  statusLabel,
+  buildPhase,
   estimatedCompletion,
   actualCompletion,
   href,
@@ -27,7 +31,7 @@ export function DevelopmentCard({
   return (
     <Link
       href={href}
-      className="group bg-white border border-border-grey flex flex-col overflow-hidden transition-all hover:shadow-lg hover:border-copper/40"
+      className="group bg-white border border-border-grey flex flex-col overflow-hidden transition-all hover:shadow-lg hover:border-copper/40 h-full"
     >
       <div className="relative aspect-[3/2] overflow-hidden bg-grey-light">
         <Image
@@ -39,7 +43,7 @@ export function DevelopmentCard({
         />
         {status && (
           <div className="absolute top-4 right-4">
-            <StatusBadge status={status} />
+            <StatusBadge status={status} label={statusLabel} />
           </div>
         )}
       </div>
@@ -47,6 +51,9 @@ export function DevelopmentCard({
         <h3 className="card-title">{name}</h3>
         <p className="text-charcoal">{address}</p>
         {specs && <p className="text-charcoal/80 text-sm">{specs}</p>}
+        {buildPhase && (
+          <p className="text-copper text-xs uppercase tracking-wider font-semibold">{buildPhase}</p>
+        )}
         {(estimatedCompletion || actualCompletion) && (
           <dl className="mt-2 text-sm space-y-1">
             {estimatedCompletion && (

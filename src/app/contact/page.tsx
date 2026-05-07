@@ -3,15 +3,16 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { EnquiryForm } from '@/components/developments/EnquiryForm';
-import { activeDevelopments, siteSettings } from '@/lib/mock-data';
+import { activeDevelopments } from '@/lib/developments';
+import { siteSettings } from '@/lib/mock-data';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with the Neilston Homes team — we respond to every enquiry within one business day.',
 };
 
-export default function ContactPage() {
-  const options = activeDevelopments().map((d) => ({ slug: d.slug, name: d.name }));
+export default async function ContactPage() {
+  const options = (await activeDevelopments()).map((d) => ({ slug: d.slug, name: d.name }));
 
   return (
     <div className="py-20 md:py-24">
