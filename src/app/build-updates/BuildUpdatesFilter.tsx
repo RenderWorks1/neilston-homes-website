@@ -45,7 +45,7 @@ export function BuildUpdatesFilter({ developments }: { developments: Development
             address={d.address}
             status={d.status}
             statusLabel={d.statusLabel}
-            href={`/build-updates/${d.slug}`}
+            href={`/developments/${d.slug}`}
           />
         ))}
       </DevelopmentGrid>

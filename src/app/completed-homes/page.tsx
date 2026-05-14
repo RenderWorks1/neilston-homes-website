@@ -16,7 +16,7 @@ export default async function CompletedHomesPage() {
     <div className="py-20 md:py-24">
       <Container>
         <SectionHeading as="h1" title="Completed Homes">
-          <p>Delivered on time and to a standard we stand behind. Every completed Neilston development — with estimated and actual completion dates for full transparency.</p>
+          <p>Delivered on time and to a standard we stand behind. Every completed Neilston development, with estimated and actual completion dates for full transparency.</p>
         </SectionHeading>
         <DevelopmentGrid count={items.length}>
           {items.map((d) => (
@@ -26,9 +26,8 @@ export default async function CompletedHomesPage() {
               name={d.name}
               address={d.address}
               specs={developmentSpecsLine(d)}
-              estimatedCompletion={d.completionEstimate}
               actualCompletion={d.actualCompletion}
-              href={`/build-updates/${d.slug}`}
+              href={`/developments/${d.slug}`}
             />
           ))}
         </DevelopmentGrid>

@@ -13,7 +13,7 @@ export function AvailableHomesTable({ homes }: { homes: Home[] }) {
   if (homes.length === 0) {
     return (
       <p className="text-charcoal">
-        No homes currently available — get in touch to register your interest in the next release.
+        No homes currently available. Get in touch to register your interest in the next release.
       </p>
     );
   }

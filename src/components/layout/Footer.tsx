@@ -14,8 +14,8 @@ const quickLinks = [
 export function Footer() {
   return (
     <footer className="bg-grey-dark text-white mt-24">
-      <div className="container-x py-16 grid gap-10 md:grid-cols-[1.2fr_1fr_1fr]">
-        <div>
+      <div className="container-x py-16 flex flex-col md:flex-row md:justify-between gap-10 md:gap-16">
+        <div className="md:max-w-md">
           <Image
             src="/logos/Neilston Homes - White Logo Transparent.png"
             alt="Neilston Homes"
@@ -45,35 +45,37 @@ export function Footer() {
           </div>
         </div>
 
-        <div>
-          <h4 className="font-serif italic text-copper text-2xl mb-4">Quick Links</h4>
-          <ul className="space-y-2">
-            {quickLinks.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="text-white/80 hover:text-copper transition-colors">
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <div className="flex flex-col sm:flex-row gap-10 sm:gap-16 lg:gap-24">
+          <div>
+            <h4 className="font-serif italic text-copper text-2xl mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              {quickLinks.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-white/80 hover:text-copper transition-colors">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div>
-          <h4 className="font-serif italic text-copper text-2xl mb-4">Get in Touch</h4>
-          <ul className="space-y-3 text-white/80">
-            <li className="flex items-start gap-3">
-              <Phone size={18} className="text-copper mt-0.5 shrink-0" />
-              <a href={`tel:${siteSettings.contactPhone.replace(/\s+/g, '')}`}>{siteSettings.contactPhone}</a>
-            </li>
-            <li className="flex items-start gap-3">
-              <Mail size={18} className="text-copper mt-0.5 shrink-0" />
-              <a href={`mailto:${siteSettings.contactEmail}`}>{siteSettings.contactEmail}</a>
-            </li>
-            <li className="flex items-start gap-3">
-              <MapPin size={18} className="text-copper mt-0.5 shrink-0" />
-              <span>{siteSettings.address}</span>
-            </li>
-          </ul>
+          <div>
+            <h4 className="font-serif italic text-copper text-2xl mb-4">Get in Touch</h4>
+            <ul className="space-y-3 text-white/80">
+              <li className="flex items-start gap-3">
+                <Phone size={18} className="text-copper mt-0.5 shrink-0" />
+                <a href={`tel:${siteSettings.contactPhone.replace(/\s+/g, '')}`}>{siteSettings.contactPhone}</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <Mail size={18} className="text-copper mt-0.5 shrink-0" />
+                <a href={`mailto:${siteSettings.contactEmail}`}>{siteSettings.contactEmail}</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPin size={18} className="text-copper mt-0.5 shrink-0" />
+                <span>{siteSettings.address}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <div className="border-t border-white/10">

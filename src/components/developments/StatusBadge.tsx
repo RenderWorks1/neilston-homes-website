@@ -9,6 +9,14 @@ const styles: Record<DevelopmentStatus, string> = {
   Completed: 'bg-charcoal',
 };
 
+const defaultLabels: Record<DevelopmentStatus, string> = {
+  Available: 'For Sale',
+  'Under Offer': 'Under Offer',
+  Sold: 'Sold Out',
+  'Sold Out': 'Sold Out',
+  Completed: 'Completed',
+};
+
 export function StatusBadge({
   status,
   label,
@@ -26,7 +34,7 @@ export function StatusBadge({
         className,
       )}
     >
-      {label ?? status}
+      {label ?? defaultLabels[status]}
     </span>
   );
 }

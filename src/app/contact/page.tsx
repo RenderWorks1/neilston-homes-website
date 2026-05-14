@@ -8,7 +8,7 @@ import { siteSettings } from '@/lib/mock-data';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with the Neilston Homes team — we respond to every enquiry within one business day.',
+  description: 'Get in touch with the Neilston Homes team. We respond to every enquiry within one business day.',
 };
 
 export default async function ContactPage() {

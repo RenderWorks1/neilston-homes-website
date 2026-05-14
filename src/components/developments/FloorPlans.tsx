@@ -9,7 +9,13 @@ export function FloorPlans({ plans }: { plans: FloorPlan[] }) {
       {plans.map((plan) => (
         <figure key={plan.label} className="bg-white border border-border-grey">
           <div className="relative aspect-[4/3] bg-grey-light">
-            <Image src={plan.image} alt={plan.label} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-6" />
+            {plan.image ? (
+              <Image src={plan.image} alt={plan.label} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-6" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center border-2 border-dashed border-border-grey">
+                <span className="text-charcoal/50 text-sm uppercase tracking-wider font-semibold">Pending Floor Plan</span>
+              </div>
+            )}
           </div>
           <figcaption className="p-5 flex items-center justify-between gap-4 border-t border-border-grey">
             <span className="font-serif italic text-copper text-xl">{plan.label}</span>

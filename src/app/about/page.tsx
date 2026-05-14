@@ -41,42 +41,87 @@ export default function AboutPage() {
       <section className="py-20 md:py-24 bg-grey-light">
         <Container>
           <SectionHeading eyebrow="Our Team" title="The People Behind Your Home" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {teamMembers.map((m) => {
-              const objectPosition =
-                {
-                  'Sara Daji': 'center 20%',
-                  'Matt Wootton': 'center 20%',
-                }[m.name] ?? 'top';
-              return (
-              <div key={m.name} className="text-center md:text-left">
-                <div className="relative aspect-square bg-copper/10 mb-5 overflow-hidden">
-                  {m.photo ? (
-                    <Image
-                      src={m.photo}
-                      alt={m.name}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover"
-                      style={{ objectPosition }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="font-serif italic text-copper text-5xl">
-                        {m.name.split(' ').map((n) => n[0]).join('')}
-                      </span>
+          {(() => {
+            const tony = teamMembers.find((m) => m.name === 'Tony Houston');
+            const others = teamMembers.filter((m) => m.name !== 'Tony Houston');
+            return (
+              <>
+                {tony && (
+                  <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center mb-16 md:mb-20">
+                    <div className="relative aspect-square bg-copper/10 overflow-hidden max-w-md md:max-w-none mx-auto md:mx-0 w-full">
+                      {tony.photo ? (
+                        <Image
+                          src={tony.photo}
+                          alt={tony.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                          style={{ objectPosition: 'top' }}
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="font-serif italic text-copper text-6xl">
+                            {tony.name.split(' ').map((n) => n[0]).join('')}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
+                    <div>
+                      <h3 className="font-serif italic text-copper text-3xl md:text-4xl leading-tight mb-2">{tony.name}</h3>
+                      <p className="text-charcoal/70 text-sm uppercase tracking-wider mb-6">{tony.role}</p>
+                      <div className="prose-neilston max-w-none">
+                        <p>The team behind Neilston Homes brings over 90 years of combined experience in the building industry.</p>
+                        <p>
+                          Managing Director Tony Houston previously led the company that built the first home in Hobsonville Point and was instrumental in developing the Axis affordable terraced housing model.
+                        </p>
+                        <p>
+                          Since then, Neilston Homes has focused on central Auckland locations and has delivered over 90 new homes in recent years.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+                  {others.map((m) => {
+                    const objectPosition =
+                      {
+                        'Sara Daji': 'center 20%',
+                        'Matt Wootton': 'center 20%',
+                      }[m.name] ?? 'top';
+                    return (
+                      <div key={m.name} className="text-center md:text-left">
+                        <div className="relative aspect-square bg-copper/10 mb-5 overflow-hidden">
+                          {m.photo ? (
+                            <Image
+                              src={m.photo}
+                              alt={m.name}
+                              fill
+                              sizes="(max-width: 768px) 50vw, 33vw"
+                              className="object-cover"
+                              style={{ objectPosition }}
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="font-serif italic text-copper text-5xl">
+                                {m.name.split(' ').map((n) => n[0]).join('')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="font-serif italic text-copper text-2xl">{m.name}</h3>
+                        <p className="text-charcoal/70 text-sm uppercase tracking-wider mb-2">{m.role}</p>
+                        {m.bio && <p className="text-charcoal text-sm leading-relaxed">{m.bio}</p>}
+                      </div>
+                    );
+                  })}
                 </div>
-                <h3 className="font-serif italic text-copper text-2xl">{m.name}</h3>
-                <p className="text-charcoal/70 text-sm uppercase tracking-wider mb-2">{m.role}</p>
-                {m.bio && <p className="text-charcoal text-sm leading-relaxed">{m.bio}</p>}
-              </div>
-              );
-            })}
-          </div>
+              </>
+            );
+          })()}
         </Container>
       </section>
+
+      <StatsBar delivered={homePage.homesDelivered} underConstruction={homePage.underConstruction} />
 
       <section className="py-20 md:py-24 bg-white">
         <Container>
@@ -95,8 +140,6 @@ export default function AboutPage() {
           </div>
         </Container>
       </section>
-
-      <StatsBar delivered={homePage.homesDelivered} underConstruction={homePage.underConstruction} />
     </>
   );
 }

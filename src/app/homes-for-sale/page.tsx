@@ -19,7 +19,7 @@ export default async function HomesForSalePage() {
           <p>A current view of every Neilston Homes development available to buy. Click through for floor plans, renders, build progress and to enquire.</p>
         </SectionHeading>
         {items.length === 0 ? (
-          <p className="text-charcoal">New developments launching soon — get in touch to be the first to hear.</p>
+          <p className="text-charcoal">New developments launching soon. Get in touch to be the first to hear.</p>
         ) : (
           <DevelopmentGrid count={items.length}>
             {items.map((d) => (
@@ -30,7 +30,7 @@ export default async function HomesForSalePage() {
                 address={d.address}
                 specs={developmentSpecsLine(d)}
                 status={d.status}
-                href={`/homes-for-sale/${d.slug}`}
+                href={`/developments/${d.slug}`}
               />
             ))}
           </DevelopmentGrid>

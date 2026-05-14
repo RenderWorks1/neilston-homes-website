@@ -18,18 +18,18 @@ export function PhotoCarousel({ images, alt }: { images: string[]; alt: string }
     <div className="relative">
       <div
         ref={scrollerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 -mx-1 px-1"
+        className="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {images.map((src, i) => (
           <div
             key={i}
-            className="relative shrink-0 snap-start w-[85%] md:w-[48%] lg:w-[32%] xl:w-[24%] aspect-[4/3] bg-grey-light overflow-hidden"
+            className="relative shrink-0 snap-start w-[85%] md:w-[60%] lg:w-[48%] aspect-[16/10] bg-grey-light overflow-hidden"
           >
             <Image
               src={src}
               alt={`${alt} — image ${i + 1}`}
               fill
-              sizes="(max-width: 768px) 85vw, 25vw"
+              sizes="(max-width: 768px) 90vw, 65vw"
               className="object-cover"
             />
           </div>
@@ -38,16 +38,16 @@ export function PhotoCarousel({ images, alt }: { images: string[]; alt: string }
       <button
         aria-label="Previous"
         onClick={() => scroll('left')}
-        className="absolute -left-2 top-1/2 -translate-y-1/2 bg-white border border-border-grey shadow-md p-2 hover:bg-copper hover:text-white hover:border-copper transition-colors"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/95 border border-border-grey shadow-lg p-3 md:p-4 hover:bg-copper hover:text-white hover:border-copper transition-colors"
       >
-        <ChevronLeft size={24} />
+        <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
       </button>
       <button
         aria-label="Next"
         onClick={() => scroll('right')}
-        className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white border border-border-grey shadow-md p-2 hover:bg-copper hover:text-white hover:border-copper transition-colors"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/95 border border-border-grey shadow-lg p-3 md:p-4 hover:bg-copper hover:text-white hover:border-copper transition-colors"
       >
-        <ChevronRight size={24} />
+        <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
       </button>
     </div>
   );

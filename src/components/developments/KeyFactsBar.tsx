@@ -1,4 +1,4 @@
-import { Home, BedDouble, Bath, Car, CalendarClock } from 'lucide-react';
+import { Home, BedDouble, Bath, Car } from 'lucide-react';
 import type { Development } from '@/lib/types';
 
 export function KeyFactsBar({ development }: { development: Development }) {
@@ -7,10 +7,9 @@ export function KeyFactsBar({ development }: { development: Development }) {
     { icon: BedDouble, label: 'Bedrooms', value: development.bedrooms },
     { icon: Bath, label: 'Bathrooms', value: development.bathrooms },
     { icon: Car, label: 'Car Parks', value: development.carParks },
-    { icon: CalendarClock, label: 'Completion', value: development.completionEstimate },
   ];
   return (
-    <ul className="grid grid-cols-2 md:grid-cols-5 gap-6">
+    <ul className="grid grid-cols-2 md:grid-cols-4 gap-6">
       {facts.map((f) => (
         <li key={f.label} className="flex flex-col gap-2">
           <f.icon className="text-copper" size={32} strokeWidth={1.5} />

@@ -8,7 +8,7 @@ const icons = { shield: Shield, 'map-pin': MapPin, home: Home, hammer: Hammer };
 
 export function WhyNeilston({ signals }: { signals: TrustSignal[] }) {
   return (
-    <section className="py-20 md:py-28 bg-white">
+    <section className="py-28 md:py-40 bg-grey-light">
       <Container>
         <FadeIn>
           <SectionHeading eyebrow="Why Neilston" title="Built for Kiwis, by Kiwis" align="center" />
