@@ -9,10 +9,14 @@ import { LocationMap } from '@/components/developments/LocationMap';
 import { EnquiryForm } from '@/components/developments/EnquiryForm';
 import { StatusBadge } from '@/components/developments/StatusBadge';
 import { AvailableHomesTable } from '@/components/developments/AvailableHomesTable';
+import { AvailabilityBar } from '@/components/developments/AvailabilityBar';
+import { DevelopmentResources } from '@/components/developments/DevelopmentResources';
+import { BuildProgress } from '@/components/developments/BuildProgress';
+import { CompletedDevelopment } from '@/components/developments/CompletedDevelopment';
 import { developments } from '@/lib/mock-data';
 import { getDevelopment } from '@/lib/developments';
 import { getBuildUpdate } from '@/lib/build-updates';
-import { getAvailableHomesForDevelopment } from '@/lib/homes';
+import { getAvailableHomesForDevelopment, getSalesSummary } from '@/lib/homes';
 
 export function generateStaticParams() {
   return developments.map((d) => ({ slug: d.slug }));
@@ -31,17 +35,23 @@ export default async function DevelopmentPage({ params }: { params: { slug: stri
   const d = await getDevelopment(params.slug);
   if (!d) notFound();
 
-  const [buildUpdate, availableHomes] = await Promise.all([
+  const [buildUpdate, availableHomes, salesSummary] = await Promise.all([
     getBuildUpdate(d.slug),
     getAvailableHomesForDevelopment(d.slug),
+    getSalesSummary(d.slug),
   ]);
 
   const isCompleted = d.status === 'Completed';
+  if (isCompleted) {
+    return <CompletedDevelopment development={d} buildUpdate={buildUpdate} />;
+  }
+
   const showEnquiry = !isCompleted;
   const showHomesTable = !isCompleted && availableHomes.length > 0;
   const hasDescription = d.description?.some((p) => p.trim().length > 0);
   const hasGallery = d.gallery?.length > 0;
   const hasFloorPlans = d.floorPlans?.length > 0;
+  const hasSitePlan = Boolean(d.sitePlanImage);
   const hasBuildUpdates = buildUpdate && buildUpdate.updates.length > 0;
   const hasLocation = Boolean(d.location?.lat && d.location?.lng);
 
@@ -79,38 +89,7 @@ export default async function DevelopmentPage({ params }: { params: { slug: stri
         </div>
       </section>
 
-      {(() => {
-        const items: { label: string; value: string }[] = [];
-        if (isCompleted) {
-          const date = d.actualCompletion || d.completionEstimate;
-          if (date) items.push({ label: 'Completion Date', value: date });
-        } else {
-          const statusLabel =
-            d.status === 'Available'
-              ? 'For Sale'
-              : d.status === 'Under Offer'
-              ? 'Under Offer'
-              : d.status === 'Sold Out' || d.status === 'Sold'
-              ? 'Sold Out'
-              : null;
-          if (statusLabel) items.push({ label: 'Availability', value: statusLabel });
-        }
-        if (items.length === 0) return null;
-        return (
-          <section className="bg-copper text-white">
-            <Container>
-              <div className="py-8 md:py-10">
-                {items.map((s) => (
-                  <div key={s.label}>
-                    <div className="eyebrow !text-white/80 mb-1">{s.label}</div>
-                    <div className="font-serif italic text-2xl md:text-3xl">{s.value}</div>
-                  </div>
-                ))}
-              </div>
-            </Container>
-          </section>
-        );
-      })()}
+      <AvailabilityBar percentSold={salesSummary.percentSold} bedPrices={salesSummary.bedPrices} />
 
       {(() => {
         const sections: { key: string; id?: string; content: React.ReactNode }[] = [];
@@ -118,11 +97,14 @@ export default async function DevelopmentPage({ params }: { params: { slug: stri
           sections.push({
             key: 'about',
             content: (
-              <div className="prose-neilston max-w-3xl">
-                <h2 className="section-title mb-6">About {d.name}</h2>
-                {d.description.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
+              <div className="grid lg:grid-cols-3 gap-10 lg:gap-16 items-start">
+                <div className="prose-neilston lg:col-span-2">
+                  <h2 className="section-title mb-6">About {d.name}</h2>
+                  {d.description.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+                <DevelopmentResources development={d} />
               </div>
             ),
           });
@@ -134,6 +116,28 @@ export default async function DevelopmentPage({ params }: { params: { slug: stri
               <>
                 <h2 className="section-title mb-8">Photos & Renders</h2>
                 <PhotoCarousel images={d.gallery} alt={d.name} />
+              </>
+            ),
+          });
+        }
+        if (hasSitePlan) {
+          sections.push({
+            key: 'site-plan',
+            content: (
+              <>
+                <h2 className="section-title mb-3">Site Plan</h2>
+                <p className="text-charcoal mb-8 max-w-2xl">
+                  {salesSummary.available} of {salesSummary.total} homes available.
+                </p>
+                <div className="relative w-full aspect-[16/10] bg-grey-light border border-border-grey overflow-hidden">
+                  <Image
+                    src={d.sitePlanImage!}
+                    alt={`${d.name} site plan`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 80vw"
+                    className="object-contain"
+                  />
+                </div>
               </>
             ),
           });
@@ -169,26 +173,7 @@ export default async function DevelopmentPage({ params }: { params: { slug: stri
             content: (
               <>
                 <h2 className="section-title mb-8">Build Progress</h2>
-                <div className="space-y-12 md:space-y-16">
-                  {buildUpdate!.updates.map((u) => (
-                    <div key={u.month}>
-                      <h3 className="uppercase tracking-[0.15em] font-bold text-charcoal text-base md:text-lg mb-5">
-                        {u.month.toUpperCase()}
-                      </h3>
-                      {u.photos.length > 0 && <PhotoCarousel images={u.photos} alt={`${d.name} — ${u.month}`} />}
-                      {u.workCompleted.length > 0 && (
-                        <div className="mt-6">
-                          <h4 className="font-semibold text-charcoal mb-2">Work completed in the month:</h4>
-                          <ul className="list-disc pl-6 space-y-1 text-charcoal">
-                            {u.workCompleted.map((w, i) => (
-                              <li key={i}>{w}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <BuildProgress updates={buildUpdate!.updates} name={d.name} />
               </>
             ),
           });
@@ -211,9 +196,26 @@ export default async function DevelopmentPage({ params }: { params: { slug: stri
             content: (
               <div className="grid md:grid-cols-[1fr_1.2fr] gap-12 items-start">
                 <div>
-                  <h2 className="section-title mb-4">Enquire about {d.name}</h2>
+                  <h2 className="section-title mb-6">Enquire about {d.name}</h2>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="relative w-20 h-20 shrink-0 rounded-full overflow-hidden bg-copper/10">
+                      <Image
+                        src="/images/teampics/SaraDaji.jpg"
+                        alt="Sara, Operations Manager at Neilston Homes"
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                        style={{ objectPosition: 'center 20%' }}
+                      />
+                    </div>
+                    <div>
+                      <div className="font-serif italic text-copper text-xl">Sara</div>
+                      <div className="text-charcoal/70 text-sm uppercase tracking-wider">Operations Manager</div>
+                    </div>
+                  </div>
                   <p className="text-charcoal leading-relaxed max-w-md">
-                    Leave your details and one of our team will be in touch within one business day with more information, floor plans, and available homes.
+                    Leave your details and Sara will be in touch within one business day with more
+                    information, floor plans, and available homes.
                   </p>
                 </div>
                 <div className="bg-white border border-border-grey p-6 md:p-10">

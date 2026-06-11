@@ -24,6 +24,9 @@ export default function AboutPage() {
               <p>
                 That&rsquo;s why our homes are built to be modern, affordable, sustainable and to a quality Kiwi&rsquo;s expect. Every project is led out of our Auckland office by a team who have been designing and building homes across the region for decades.
               </p>
+              <p>
+                The team behind Neilston Homes brings over 90 years of combined experience in the building industry.
+              </p>
             </div>
             <div className="relative aspect-[4/3] bg-grey-light overflow-hidden">
               <Image
@@ -70,13 +73,9 @@ export default function AboutPage() {
                       <h3 className="font-serif italic text-copper text-3xl md:text-4xl leading-tight mb-2">{tony.name}</h3>
                       <p className="text-charcoal/70 text-sm uppercase tracking-wider mb-6">{tony.role}</p>
                       <div className="prose-neilston max-w-none">
-                        <p>The team behind Neilston Homes brings over 90 years of combined experience in the building industry.</p>
-                        <p>
-                          Managing Director Tony Houston previously led the company that built the first home in Hobsonville Point and was instrumental in developing the Axis affordable terraced housing model.
-                        </p>
-                        <p>
-                          Since then, Neilston Homes has focused on central Auckland locations and has delivered over 90 new homes in recent years.
-                        </p>
+                        {tony.bio.split('\n\n').map((para, i) => (
+                          <p key={i}>{para}</p>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -110,7 +109,12 @@ export default function AboutPage() {
                         </div>
                         <h3 className="font-serif italic text-copper text-2xl">{m.name}</h3>
                         <p className="text-charcoal/70 text-sm uppercase tracking-wider mb-2">{m.role}</p>
-                        {m.bio && <p className="text-charcoal text-sm leading-relaxed">{m.bio}</p>}
+                        {m.bio &&
+                          m.bio.split('\n\n').map((para, i) => (
+                            <p key={i} className="text-charcoal text-sm leading-relaxed mt-2 first:mt-0">
+                              {para}
+                            </p>
+                          ))}
                       </div>
                     );
                   })}

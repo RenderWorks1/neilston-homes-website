@@ -24,6 +24,22 @@ export interface Development {
   carParks: string;
   completionEstimate: string;
   actualCompletion?: string;
+  /** Optional marketing "from" price. When omitted, the lowest available home price (from SmartSuite) is used. */
+  priceFrom?: number;
+  /** Nearby amenities shown beside the location map (schools, parks, transport, shops). */
+  amenities?: string[];
+  /** Downloadable asset paths (in /public). Each button only renders when its file is set. */
+  infoPackPdf?: string;
+  floorPlansPdf?: string;
+  coloursSpecsPdf?: string;
+  /** Site-plan artwork (in /public). The Site Plan section only renders when this is set. */
+  sitePlanImage?: string;
+  /** Completed-page hero video (in /public). Falls back to heroImage when unset. */
+  heroVideo?: string;
+  /** Render-vs-reality before/after pairs shown as a draggable slider on the completed page. */
+  renderReality?: RenderRealityPair[];
+  /** Resident/buyer testimonials shown on the completed page. */
+  testimonials?: Testimonial[];
   heroImage: string;
   gallery: string[];
   floorPlans: FloorPlan[];
@@ -32,6 +48,21 @@ export interface Development {
   location: { lat: number; lng: number };
   suburbHighlights: string[];
   order?: number;
+}
+
+export interface RenderRealityPair {
+  /** Original render/concept image. */
+  render: string;
+  /** Matching photo of the completed reality. */
+  reality: string;
+  label?: string;
+}
+
+export interface Testimonial {
+  quote: string;
+  author: string;
+  /** Optional context, e.g. "Homeowner, Summit Views". */
+  role?: string;
 }
 
 export interface MonthlyUpdate {

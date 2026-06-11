@@ -6,6 +6,7 @@ import {
   linkedIds,
   listRecords,
   resolveStatusLabel,
+  toNumber,
   type SmartSuiteRecord,
 } from './smartsuite';
 import { developments as developmentsContent } from './mock-data';
@@ -15,8 +16,9 @@ interface DevRecord extends SmartSuiteRecord {
   title?: string;
   s6641c96d0?: string; // Marketing Name
   s04ee57df9?: { value?: string }; // Status
-  s81eb9aabf?: number; // Number of Homes (formula)
-  seuf0pl7?: number; // Number of Sold Homes (formula)
+  // SmartSuite formula fields return strings — coerce with toNumber().
+  s81eb9aabf?: number | string; // Number of Homes (formula)
+  seuf0pl7?: number | string; // Number of Sold Homes (formula)
 }
 
 interface BlockRecord extends SmartSuiteRecord {
@@ -111,8 +113,8 @@ function mergeDevelopment(
 ): Development {
   const buildPhaseLabel = resolveStatusLabel(ss.s04ee57df9, statusLabels);
   const buildPhase = mapBuildPhase(buildPhaseLabel) ?? content.buildPhase;
-  const total = typeof ss.s81eb9aabf === 'number' ? ss.s81eb9aabf : content.totalHomes;
-  const sold = typeof ss.seuf0pl7 === 'number' ? ss.seuf0pl7 : undefined;
+  const total = toNumber(ss.s81eb9aabf) ?? content.totalHomes;
+  const sold = toNumber(ss.seuf0pl7);
   const { status, statusLabel } = deriveStatus(content.status, buildPhaseLabel, total, sold);
 
   let completionEstimate = content.completionEstimate;

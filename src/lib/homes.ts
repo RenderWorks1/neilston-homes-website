@@ -4,6 +4,7 @@ import {
   dateValue,
   linkedIds,
   listRecords,
+  toNumber,
   type SmartSuiteRecord,
 } from './smartsuite';
 import { developments as developmentsContent } from './mock-data';
@@ -16,9 +17,10 @@ interface HomeRecord extends SmartSuiteRecord {
   s3r7ac4b?: string; // Carpark
   spj4gork?: string; // Land Size
   s6e674f68d?: string; // Home Size
-  sbc04882df?: number; // Price
-  sf95733dd7?: number; // Beds
-  s595c6e11c?: number; // Bathrooms
+  // SmartSuite returns all numeric fields as strings — see toNumber().
+  sbc04882df?: number | string; // Price (currency)
+  sf95733dd7?: number | string; // Beds (number)
+  s595c6e11c?: number | string; // Bathrooms (number)
   sa80e8b0b0?: { date?: string }; // Unconditional Date
   s53cfee1f3?: { date?: string }; // Handover Date
   s3aee952b1?: string[]; // Linked Block ids
@@ -65,12 +67,12 @@ function toHome(record: HomeRecord, developmentSlug: string): Home {
     developmentSlug,
     lot: record.s2c0548ce2 ?? record.title ?? '',
     address: record.scbc2zhg ?? '',
-    bedrooms: typeof record.sf95733dd7 === 'number' ? record.sf95733dd7 : undefined,
-    bathrooms: typeof record.s595c6e11c === 'number' ? record.s595c6e11c : undefined,
+    bedrooms: toNumber(record.sf95733dd7),
+    bathrooms: toNumber(record.s595c6e11c),
     carparks: record.s3r7ac4b || undefined,
     landSize: record.spj4gork || undefined,
     homeSize: record.s6e674f68d || undefined,
-    price: typeof record.sbc04882df === 'number' ? record.sbc04882df : undefined,
+    price: toNumber(record.sbc04882df),
     status: deriveStatus(record),
     unconditionalDate: dateValue(record.sa80e8b0b0),
     handoverDate: dateValue(record.s53cfee1f3),
@@ -128,4 +130,59 @@ export async function getHomesForDevelopment(slug: string): Promise<Home[]> {
 
 export async function getAvailableHomesForDevelopment(slug: string): Promise<Home[]> {
   return (await getHomesForDevelopment(slug)).filter((h) => h.status === 'Available');
+}
+
+/** Lowest price among available homes for a development, or undefined if none are priced. */
+export async function getPriceFromForDevelopment(slug: string): Promise<number | undefined> {
+  const prices = (await getAvailableHomesForDevelopment(slug))
+    .map((h) => h.price)
+    .filter((p): p is number => typeof p === 'number' && Number.isFinite(p));
+  return prices.length ? Math.min(...prices) : undefined;
+}
+
+export interface BedPrice {
+  beds: number;
+  from?: number;
+  available: number;
+}
+
+export interface SalesSummary {
+  total: number;
+  available: number;
+  sold: number;
+  /** Whole-number percentage of homes sold (0–100). */
+  percentSold: number;
+  /** Lowest available price per bedroom count, ascending. */
+  bedPrices: BedPrice[];
+}
+
+/** Availability and per-bedroom "from" pricing for a development, derived live from SmartSuite. */
+export async function getSalesSummary(slug: string): Promise<SalesSummary> {
+  const homes = await getHomesForDevelopment(slug);
+  const available = homes.filter((h) => h.status === 'Available');
+  const sold = homes.filter((h) => h.status === 'Sold');
+  const total = homes.length;
+
+  const byBed = new Map<number, number[]>();
+  for (const h of available) {
+    if (typeof h.bedrooms !== 'number') continue;
+    const prices = byBed.get(h.bedrooms) ?? [];
+    if (typeof h.price === 'number') prices.push(h.price);
+    byBed.set(h.bedrooms, prices);
+  }
+  const bedPrices: BedPrice[] = [...byBed.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([beds, prices]) => ({
+      beds,
+      from: prices.length ? Math.min(...prices) : undefined,
+      available: available.filter((h) => h.bedrooms === beds).length,
+    }));
+
+  return {
+    total,
+    available: available.length,
+    sold: sold.length,
+    percentSold: total ? Math.round((sold.length / total) * 100) : 0,
+    bedPrices,
+  };
 }

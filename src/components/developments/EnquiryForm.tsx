@@ -55,7 +55,7 @@ export function EnquiryForm({ developmentSlug, developmentName, developmentOptio
         <CheckCircle2 className="text-status-available shrink-0 mt-1" />
         <div>
           <h3 className="font-serif italic text-copper text-2xl mb-2">Thank you</h3>
-          <p>Your enquiry has been received. A member of our team will be in touch within one business day.</p>
+          <p>Your enquiry has been received. Sara will be in touch within one business day.</p>
         </div>
       </div>
     );

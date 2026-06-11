@@ -23,13 +23,13 @@ export function PhotoCarousel({ images, alt }: { images: string[]; alt: string }
         {images.map((src, i) => (
           <div
             key={i}
-            className="relative shrink-0 snap-start w-[85%] md:w-[60%] lg:w-[48%] aspect-[16/10] bg-grey-light overflow-hidden"
+            className="relative shrink-0 snap-start w-[80%] md:w-[42%] lg:w-[31.5%] aspect-[16/10] bg-grey-light overflow-hidden"
           >
             <Image
               src={src}
               alt={`${alt} — image ${i + 1}`}
               fill
-              sizes="(max-width: 768px) 90vw, 65vw"
+              sizes="(max-width: 768px) 80vw, 32vw"
               className="object-cover"
             />
           </div>

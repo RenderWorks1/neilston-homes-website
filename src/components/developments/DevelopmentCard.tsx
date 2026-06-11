@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Development, DevelopmentStatus } from '@/lib/types';
+import { formatNZD } from '@/lib/utils';
 
 const statusBgColors: Record<DevelopmentStatus, string> = {
   Available: 'bg-copper',
@@ -27,6 +28,7 @@ interface Props {
   statusLabel?: string;
   buildPhase?: string;
   actualCompletion?: string;
+  priceFrom?: number;
   href: string;
 }
 
@@ -39,6 +41,7 @@ export function DevelopmentCard({
   statusLabel,
   buildPhase,
   actualCompletion,
+  priceFrom,
   href,
 }: Props) {
   return (
@@ -82,6 +85,11 @@ export function DevelopmentCard({
         {specs && <p className="text-charcoal/80 text-sm">{specs}</p>}
         {buildPhase && (
           <p className="text-copper text-xs uppercase tracking-wider font-semibold">{buildPhase}</p>
+        )}
+        {typeof priceFrom === 'number' && (
+          <p className="text-charcoal font-semibold">
+            From <span className="text-copper">{formatNZD(priceFrom)}</span>
+          </p>
         )}
         {actualCompletion && (
           <dl className="mt-2 text-sm space-y-1">

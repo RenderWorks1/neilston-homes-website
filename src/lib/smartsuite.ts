@@ -179,3 +179,75 @@ export function linkedIds(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   return raw.filter((x): x is string => typeof x === 'string');
 }
+
+/**
+ * Coerce a SmartSuite numeric value to a number. SmartSuite returns ALL numeric field
+ * types (number, currency, formula, count, percent) as strings — e.g. "3", "815000",
+ * "1.5" — so a `typeof === 'number'` guard silently drops every value. Returns undefined
+ * for empty/unparseable input.
+ */
+export function toNumber(raw: unknown): number | undefined {
+  if (typeof raw === 'number') return Number.isFinite(raw) ? raw : undefined;
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    const n = Number(trimmed.replace(/[^0-9.\-]/g, ''));
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return undefined;
+}
+
+export interface SmartSuiteFile {
+  handle: string;
+  file_type?: string;
+  metadata?: { filename?: string; mimetype?: string; size?: number };
+}
+
+export function fileList(raw: unknown): SmartSuiteFile[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((f): f is SmartSuiteFile => Boolean(f && typeof (f as SmartSuiteFile).handle === 'string'));
+}
+
+interface SharedFile {
+  handle: string;
+  security?: { policy?: string; signature?: string };
+}
+
+// Resolved signed CDN URLs are cached far longer than record data: the bytes for a
+// handle are immutable and the signature stays valid for months, so we only pay the
+// per-file lookup once (cold start / when a new handle first appears).
+const FILE_URL_TTL = 6 * 60 * 60 * 1000;
+const fileUrlCache = new Map<string, { url: string; expires: number }>();
+
+async function resolveFileUrl(handle: string): Promise<string | undefined> {
+  const cached = fileUrlCache.get(handle);
+  if (cached && cached.expires > Date.now()) return cached.url;
+  try {
+    const file = await smartsuiteFetch<SharedFile>(`/shared-files/${handle}/`, {}, false);
+    const policy = file.security?.policy;
+    const signature = file.security?.signature;
+    if (!policy || !signature) return undefined;
+    const url = `https://cdn.filestackcontent.com/security=p:${policy},s:${signature}/${handle}`;
+    fileUrlCache.set(handle, { url, expires: Date.now() + FILE_URL_TTL });
+    return url;
+  } catch (err) {
+    console.error(`[smartsuite] failed to resolve file ${handle}:`, err);
+    return undefined;
+  }
+}
+
+/** Resolve many file handles to signed CDN URLs with bounded concurrency. */
+export async function resolveFileUrls(handles: string[]): Promise<Map<string, string>> {
+  const unique = [...new Set(handles)];
+  const result = new Map<string, string>();
+  const CONCURRENCY = 8;
+  for (let i = 0; i < unique.length; i += CONCURRENCY) {
+    const batch = unique.slice(i, i + CONCURRENCY);
+    const urls = await Promise.all(batch.map((h) => resolveFileUrl(h)));
+    batch.forEach((h, j) => {
+      const url = urls[j];
+      if (url) result.set(h, url);
+    });
+  }
+  return result;
+}

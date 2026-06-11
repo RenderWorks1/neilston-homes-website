@@ -1,9 +1,10 @@
-import { MapPin } from 'lucide-react';
+import { MapPin, Check } from 'lucide-react';
 import type { Development } from '@/lib/types';
 
 export function LocationMap({ development }: { development: Development }) {
   const { lat, lng } = development.location;
   const src = `https://www.google.com/maps?ll=${lat},${lng}&z=15&t=m&output=embed`;
+  const amenities = development.amenities ?? [];
 
   return (
     <div className="grid md:grid-cols-2 gap-10 items-start">
@@ -24,13 +25,26 @@ export function LocationMap({ development }: { development: Development }) {
           <MapPin className="w-10 h-10 text-copper" fill="currentColor" strokeWidth={1.5} stroke="white" />
         </div>
       </div>
-      <div className="space-y-4">
-        <h3 className="font-serif italic text-copper text-2xl md:text-3xl">About {development.suburb}</h3>
-        {development.suburbHighlights.map((text, i) => (
-          <p key={i} className="text-charcoal text-sm md:text-base leading-relaxed">
-            {text}
-          </p>
-        ))}
+      <div className="space-y-5">
+        <h3 className="font-serif italic text-copper text-2xl md:text-3xl">
+          {amenities.length ? 'Amenities Nearby' : `About ${development.suburb}`}
+        </h3>
+        {amenities.length ? (
+          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+            {amenities.map((item, i) => (
+              <li key={i} className="flex items-start gap-3 text-charcoal text-sm md:text-base">
+                <Check className="text-copper shrink-0 mt-0.5" size={18} strokeWidth={2.5} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          development.suburbHighlights.map((text, i) => (
+            <p key={i} className="text-charcoal text-sm md:text-base leading-relaxed">
+              {text}
+            </p>
+          ))
+        )}
       </div>
     </div>
   );

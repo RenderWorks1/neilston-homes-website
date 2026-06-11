@@ -2,8 +2,10 @@ import 'server-only';
 import {
   APP_IDS,
   dateValue,
+  fileList,
   linkedIds,
   listRecords,
+  resolveFileUrls,
   type SmartSuiteRecord,
 } from './smartsuite';
 import { developments as developmentsContent } from './mock-data';
@@ -15,6 +17,7 @@ interface UpdateRecord extends SmartSuiteRecord {
   s906c9a677?: boolean; // Make Public
   s1d9ec2161?: { date?: string }; // Date Update Received
   se77066cd1?: string[]; // Linked block ids
+  se96f54f3a?: unknown; // Image (file field)
 }
 
 interface BlockRecord extends SmartSuiteRecord {
@@ -88,9 +91,10 @@ async function loadAll(): Promise<Map<string, BuildUpdate>> {
   }
   const devToSlug = devIdToSlugMap(ssDevs);
 
-  // Group: slug -> monthLabel -> { workCompleted: string[], sortKey: number }
-  type Grouped = Map<string, { sortKey: number; workCompleted: string[] }>;
+  // Group: slug -> monthLabel -> { workCompleted, sortKey, imageHandles }
+  type Grouped = Map<string, { sortKey: number; workCompleted: string[]; imageHandles: string[] }>;
   const bySlug = new Map<string, Grouped>();
+  const allHandles: string[] = [];
 
   for (const u of ssUpdates) {
     if (!u.s906c9a677) continue;
@@ -105,7 +109,12 @@ async function loadAll(): Promise<Map<string, BuildUpdate>> {
     if (!month) continue;
     const sortKey = monthSortKey(iso);
     const lines = splitWorkLines(u.s1b6b55323);
-    if (!lines.length) continue;
+    const handles = fileList(u.se96f54f3a)
+      .filter((f) => f.file_type === 'image')
+      .map((f) => f.handle);
+    // Keep a month only if it carries text or photos.
+    if (!lines.length && !handles.length) continue;
+    allHandles.push(...handles);
 
     let monthsForSlug = bySlug.get(slug);
     if (!monthsForSlug) {
@@ -117,21 +126,32 @@ async function loadAll(): Promise<Map<string, BuildUpdate>> {
       for (const line of lines) {
         if (!existing.workCompleted.includes(line)) existing.workCompleted.push(line);
       }
+      for (const h of handles) {
+        if (!existing.imageHandles.includes(h)) existing.imageHandles.push(h);
+      }
     } else {
-      monthsForSlug.set(month, { sortKey, workCompleted: [...lines] });
+      monthsForSlug.set(month, { sortKey, workCompleted: [...lines], imageHandles: [...handles] });
     }
   }
 
+  const urlMap = await resolveFileUrls(allHandles);
+
   const result = new Map<string, BuildUpdate>();
   for (const [slug, monthsMap] of bySlug) {
-    const photos = photosForDevelopment(slug);
-    const updates: MonthlyUpdate[] = [...monthsMap.entries()]
-      .sort((a, b) => b[1].sortKey - a[1].sortKey)
-      .map(([month, value]) => ({
-        month,
-        photos,
-        workCompleted: value.workCompleted,
-      }));
+    const months = [...monthsMap.entries()].sort((a, b) => b[1].sortKey - a[1].sortKey);
+    const devHasSmartSuitePhotos = months.some((m) =>
+      m[1].imageHandles.some((h) => urlMap.has(h)),
+    );
+    // Fall back to code-managed photos only for developments with no SmartSuite update images.
+    const fallbackPhotos = devHasSmartSuitePhotos ? [] : photosForDevelopment(slug);
+
+    const updates: MonthlyUpdate[] = months.map(([month, value]) => ({
+      month,
+      photos: devHasSmartSuitePhotos
+        ? value.imageHandles.map((h) => urlMap.get(h)).filter((u): u is string => Boolean(u))
+        : fallbackPhotos,
+      workCompleted: value.workCompleted,
+    }));
     result.set(slug, { slug, developmentSlug: slug, updates });
   }
 

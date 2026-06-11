@@ -4,6 +4,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { DevelopmentCard, developmentSpecsLine } from '@/components/developments/DevelopmentCard';
 import { DevelopmentGrid } from '@/components/developments/DevelopmentGrid';
 import { activeDevelopments } from '@/lib/developments';
+import { getPriceFromForDevelopment } from '@/lib/homes';
 
 export const metadata: Metadata = {
   title: 'Homes for Sale',
@@ -12,6 +13,9 @@ export const metadata: Metadata = {
 
 export default async function HomesForSalePage() {
   const items = await activeDevelopments();
+  const pricesFrom = await Promise.all(
+    items.map((d) => d.priceFrom ?? getPriceFromForDevelopment(d.slug)),
+  );
   return (
     <div className="py-20 md:py-24">
       <Container>
@@ -22,7 +26,7 @@ export default async function HomesForSalePage() {
           <p className="text-charcoal">New developments launching soon. Get in touch to be the first to hear.</p>
         ) : (
           <DevelopmentGrid count={items.length}>
-            {items.map((d) => (
+            {items.map((d, i) => (
               <DevelopmentCard
                 key={d.slug}
                 image={d.heroImage}
@@ -30,6 +34,7 @@ export default async function HomesForSalePage() {
                 address={d.address}
                 specs={developmentSpecsLine(d)}
                 status={d.status}
+                priceFrom={pricesFrom[i]}
                 href={`/developments/${d.slug}`}
               />
             ))}

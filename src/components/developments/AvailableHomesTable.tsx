@@ -1,12 +1,9 @@
 import type { Home } from '@/lib/types';
+import { formatNZD } from '@/lib/utils';
 
 function formatPrice(price?: number): string {
   if (typeof price !== 'number' || !Number.isFinite(price)) return 'Price on application';
-  return new Intl.NumberFormat('en-NZ', {
-    style: 'currency',
-    currency: 'NZD',
-    maximumFractionDigits: 0,
-  }).format(price);
+  return formatNZD(price);
 }
 
 export function AvailableHomesTable({ homes }: { homes: Home[] }) {
