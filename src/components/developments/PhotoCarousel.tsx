@@ -3,9 +3,11 @@
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
+import { Lightbox, useLightbox } from './Lightbox';
 
 export function PhotoCarousel({ images, alt }: { images: string[]; alt: string }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const lightbox = useLightbox(images.length);
 
   const scroll = (dir: 'left' | 'right') => {
     const el = scrollerRef.current;
@@ -21,18 +23,21 @@ export function PhotoCarousel({ images, alt }: { images: string[]; alt: string }
         className="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {images.map((src, i) => (
-          <div
+          <button
             key={i}
-            className="relative shrink-0 snap-start w-[80%] md:w-[42%] lg:w-[31.5%] aspect-[16/10] bg-grey-light overflow-hidden"
+            type="button"
+            onClick={() => lightbox.open(i)}
+            aria-label={`View ${alt} image ${i + 1} larger`}
+            className="relative shrink-0 snap-start w-[80%] md:w-[42%] lg:w-[31.5%] aspect-[16/10] bg-grey-light overflow-hidden group cursor-pointer"
           >
             <Image
               src={src}
               alt={`${alt} — image ${i + 1}`}
               fill
               sizes="(max-width: 768px) 80vw, 32vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
-          </div>
+          </button>
         ))}
       </div>
       <button
@@ -49,6 +54,14 @@ export function PhotoCarousel({ images, alt }: { images: string[]; alt: string }
       >
         <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
       </button>
+      <Lightbox
+        images={images}
+        alt={alt}
+        index={lightbox.index}
+        onClose={lightbox.close}
+        onNext={lightbox.next}
+        onPrev={lightbox.prev}
+      />
     </div>
   );
 }

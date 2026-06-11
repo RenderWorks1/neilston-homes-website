@@ -14,7 +14,10 @@ export const metadata: Metadata = {
 export default async function ContactPage() {
   const options = (await activeDevelopments()).map((d) => ({ slug: d.slug, name: d.name }));
 
+  const phoneHref = `tel:${siteSettings.contactPhone.replace(/\s+/g, '')}`;
+
   return (
+    <>
     <div className="py-20 md:py-24">
       <Container>
         <SectionHeading as="h1" title="Contact Us">
@@ -67,5 +70,33 @@ export default async function ContactPage() {
         </div>
       </Container>
     </div>
+
+    <section className="bg-copper text-white">
+      <Container>
+        <div className="py-12 md:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+          <div>
+            <div className="eyebrow !text-white/80 mb-2">Ready to talk?</div>
+            <h2 className="font-serif italic text-2xl md:text-3xl leading-tight">
+              We respond to every enquiry within one business day.
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-4 shrink-0">
+            <a
+              href={phoneHref}
+              className="inline-flex items-center gap-2 bg-white text-copper font-semibold px-6 py-3 hover:bg-white/90 transition-colors"
+            >
+              <Phone size={18} /> {siteSettings.contactPhone}
+            </a>
+            <a
+              href={`mailto:${siteSettings.contactEmail}`}
+              className="inline-flex items-center gap-2 border border-white/70 text-white font-semibold px-6 py-3 hover:bg-white/10 transition-colors"
+            >
+              <Mail size={18} /> Email Us
+            </a>
+          </div>
+        </div>
+      </Container>
+    </section>
+    </>
   );
 }
